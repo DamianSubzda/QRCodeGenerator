@@ -1,48 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using QRCoder;
+﻿using QRCoder;
 
 namespace QRGenerator
 {
-    internal class QRGenerator
+    internal class QRGenerator(string textToEncode)
     {
-        private string textToEncode;
-        private Bitmap qrcode;
-        private Setting setting;
-        public QRGenerator(string textToEncode)
-        {
-            this.setting = Setting.GetInstance();
-            this.textToEncode = textToEncode;
-        }
+        private readonly string textToEncode = textToEncode;
+        private Bitmap? qrcode;
+        private readonly Setting setting = Setting.GetInstance();
 
         public Bitmap GenerateQrCode()
         {
             using (QRCodeGenerator qrGenerator = new())
             {
-                QRCodeData qrCodeData;
-                switch (setting.eccLevel[0])
-                {
-                    case 'L':
-                        qrCodeData = qrGenerator.CreateQrCode(textToEncode, QRCodeGenerator.ECCLevel.L);
-                        break;
-                    case 'M':
-                        qrCodeData = qrGenerator.CreateQrCode(textToEncode, QRCodeGenerator.ECCLevel.M);
-                        break;
-                    case 'Q':
-                        qrCodeData = qrGenerator.CreateQrCode(textToEncode, QRCodeGenerator.ECCLevel.Q);
-                        break;
-                    case 'H':
-                        qrCodeData = qrGenerator.CreateQrCode(textToEncode, QRCodeGenerator.ECCLevel.H);
-                        break;
-                    default:
-                        qrCodeData = qrGenerator.CreateQrCode(textToEncode, QRCodeGenerator.ECCLevel.Q);
-                        break;
-
-                }
+                QRCodeData qrCodeData = CreateQRCodeData(qrGenerator);
 
                 using (QRCode qrCode = new(qrCodeData))
                 {
@@ -56,9 +26,22 @@ namespace QRGenerator
                     }
                     
                     return qrcode;
-
                 }
             }
+        }
+
+        private QRCodeData CreateQRCodeData(QRCodeGenerator qrGenerator)
+        {
+            QRCodeData qrCodeData = setting.eccLevel[0] switch
+            {
+                'L' => qrGenerator.CreateQrCode(textToEncode, QRCodeGenerator.ECCLevel.L),
+                'M' => qrGenerator.CreateQrCode(textToEncode, QRCodeGenerator.ECCLevel.M),
+                'Q' => qrGenerator.CreateQrCode(textToEncode, QRCodeGenerator.ECCLevel.Q),
+                'H' => qrGenerator.CreateQrCode(textToEncode, QRCodeGenerator.ECCLevel.H),
+                _ => qrGenerator.CreateQrCode(textToEncode, QRCodeGenerator.ECCLevel.Q),
+            };
+
+            return qrCodeData;
         }
     }
 }

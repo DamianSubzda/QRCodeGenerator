@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -10,7 +9,7 @@ namespace QRGenerator
 {
     internal class Setting
     {
-        private static Setting _instance;
+        private static Setting? _instance;
 
         public Color lightColor = Color.White;
         public Color darkColor = Color.Black;
